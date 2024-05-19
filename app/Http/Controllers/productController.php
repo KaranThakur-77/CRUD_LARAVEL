@@ -12,7 +12,9 @@ class productController extends Controller
      */
     public function index()
     {
-        return view("layouts.index");
+        return view("layouts.index", [
+            "products" => Products::get()
+        ]);
     }
 
     /**
@@ -29,19 +31,20 @@ class productController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "username"=>"required",
-            "email"=> "required|email",
-            "msg"=> "required|min:10",  
+            "username" => "required",
+            "email" => "required|email",
+            "msg" => "required|min:10",
         ]);
+
         // dd($request->all());
+
         $product = new Products;
         $product->name = $request->username;
         $product->email = $request->email;
         $product->message = $request->msg;
-        $product->image = $request->image;
 
         $product->save();
-        return back()->with("success","Product created successfully.");
+        return back()->with("success", "Product created successfully.");
     }
 
     /**
@@ -57,7 +60,10 @@ class productController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // dd($id);
+        return view('layouts.edit', [
+            'product' => Products::WHERE('id', $id)->first()
+        ]);
     }
 
     /**
@@ -65,7 +71,21 @@ class productController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            "username" => "required",
+            "email" => "required|email",
+            "msg" => "required|min:10",
+        ]);
+
+        // dd($request->all());
+        $product = Products::where('id',$id)->first();
+        $product->name = $request->username;
+        $product->email = $request->email;
+        $product->message = $request->msg;
+
+        $product->save();
+        return back()->with("success", "Product updated successfully.");
+        
     }
 
     /**
@@ -73,6 +93,8 @@ class productController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Products::where("id",$id)->first();
+        $product->delete();
+        return back();
     }
 }
